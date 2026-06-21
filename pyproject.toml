@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 # makes it discoverable); the import package stays `grounding` (the friendly-import pattern
 # used by pytest-mock / pytest-django): pip install pytest-grounding, from grounding import …
 name = "pytest-grounding"
-version = "0.0.1"
+version = "0.0.2"
 description = "Turn assertions about data into re-runnable, provenance-tracked claims — written and reviewed by agents."
 readme = "README.md"
 requires-python = ">=3.9"
