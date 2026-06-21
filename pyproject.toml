@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+# Distribution name is "pytest-grounding" (the pytest- prefix is the plugin convention and
+# makes it discoverable); the import package stays `grounding` (the friendly-import pattern
+# used by pytest-mock / pytest-django): pip install pytest-grounding, from grounding import …
+name = "pytest-grounding"
+version = "0.0.1"
+description = "Turn assertions about data into re-runnable, provenance-tracked claims — written and reviewed by agents."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Sam Quigley", email = "quigley@emerose.com" }]
+keywords = ["pytest", "provenance", "grounding", "claims", "reproducibility", "data", "audit"]
+classifiers = [
+    "Framework :: Pytest",
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Scientific/Engineering",
+]
+# The core is deliberately light: only pytest. Data grounding (`load`/`data`) needs
+# pandas; document quote-grounding (`doc().contains`) needs the per-format readers.
+# Both are optional extras, imported lazily, so a statement-only / quote-only install
+# stays minimal.
+dependencies = ["pytest>=7.0"]
+
+[project.urls]
+Homepage = "https://github.com/emerose/pytest-grounding"
+Repository = "https://github.com/emerose/pytest-grounding"
+Issues = "https://github.com/emerose/pytest-grounding/issues"
+
+[project.optional-dependencies]
+# CSV grounding via load()/data() and the read_csv bypass guard.
+data = ["pandas>=2.0"]
+# Document quote verification via doc().text()/contains() — offline, deterministic.
+docs = ["pdfplumber>=0.11", "python-docx>=1.1", "python-pptx>=1.0"]
+
+# Auto-load the plugin so a bare `pytest` collects grounded claims once installed.
+[project.entry-points.pytest11]
+grounding = "grounding.plugin"
+
+# `grounding trace <report>` — re-verify claims' inputs still match recorded shas.
+[project.scripts]
+grounding = "grounding.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["grounding*"]

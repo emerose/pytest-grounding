@@ -1,0 +1,10 @@
+# grounding_report.* is a regenerable projection of running the claims — never the
+# source of truth; rebuild with `pytest --grounding-out`.
+grounding_report.json
+grounding_report.md
+.venv/
+__pycache__/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
