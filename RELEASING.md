@@ -6,21 +6,23 @@ Publishing uses **PyPI Trusted Publishing (OIDC)** — there is no API token sto
 
 ## One-time setup (before the first release)
 
-1. **Create a GitHub environment named `pypi`** in the repo:
-   Settings → Environments → New environment → `pypi`.
-   (Optionally add required reviewers to gate publishes.)
+**Register the trusted publisher on PyPI.** Because the project doesn't exist on PyPI yet,
+use a *pending* publisher: <https://pypi.org/manage/account/publishing/> → add a pending
+publisher with:
 
-2. **Register the trusted publisher on PyPI.** Because the project doesn't exist on PyPI yet,
-   use a *pending* publisher: <https://pypi.org/manage/account/publishing/> → add a pending
-   publisher with:
-   - **PyPI Project Name:** `pytest-grounding`
-   - **Owner:** `emerose`
-   - **Repository name:** `pytest-grounding`
-   - **Workflow name:** `release.yml`
-   - **Environment name:** `pypi`
+- **PyPI Project Name:** `pytest-grounding`
+- **Owner:** `emerose`
+- **Repository name:** `pytest-grounding`
+- **Workflow name:** `release.yml`
+- **Environment name:** *(leave blank)*
 
-   The first successful publish creates the project and converts the pending publisher into a
-   normal one.
+The first successful publish creates the project and converts the pending publisher into a
+normal one. No GitHub environment or stored API token is needed.
+
+> Optional hardening: if you later want a manual-approval gate before each publish, create a
+> GitHub environment (Settings → Environments) with required reviewers, add `environment: <name>`
+> to the `publish` job in `release.yml`, and set the same name in the PyPI publisher config.
+> The two must match.
 
 ## Cutting a release
 

@@ -99,15 +99,51 @@ def test_summary_states_endpoint_met():
 
 ## Composing claims
 
-```python
-from grounding import uses
+`uses()` lets one claim build on earlier ones: it merges their sha-pinned inputs into this
+claim's provenance (transitively) and hands back their `evidence`. The composed claim can read
+no source of its own, yet `grounding trace` still walks it all the way down — change an upstream
+dataset and the roll-up breaks too. Provenance is a computed DAG, never hand-maintained.
 
-def test_program_wide_summary():
-    e = uses("test_treatment_lowers_biomarker_vs_vehicle")   # transitive inputs + evidence
-    assert e["pct_drop"] > 0
+**Roll up independent results.** A program-level conclusion that rests on several per-dataset
+claims — defined in different test files, over different data:
+
+```python
+from grounding import uses, statement, strength
+
+@strength("moderate")
+def test_effect_replicates_across_cohorts():
+    """The biomarker drop holds in two independently-run cohorts."""
+    b = uses("test_treatment_lowers_biomarker_vs_vehicle")   # cohort B
+    c = uses("test_treatment_lowers_biomarker_cohort_c")     # cohort C, a different test file
+    statement(f"the effect replicates: {b['pct_drop']:.0f}% (cohort B) "
+              f"and {c['pct_drop']:.0f}% (cohort C)")
+    assert b["pct_drop"] > 0 and c["pct_drop"] > 0
 ```
 
-Provenance is a computed DAG, never hand-maintained.
+This claim touches no CSV directly, but its recorded inputs now include *both* cohorts' files,
+each sha-pinned. Change either cohort's data and this roll-up — not just the two underlying
+claims — shows up as drifted.
+
+**Cross-check data against a document.** Compose a numeric claim with a quote check to assert an
+external report and your own data agree — the classic transcription-drift catcher:
+
+```python
+from grounding import doc, uses, statement, strength, kind
+
+@kind("external")
+@strength("strong")
+def test_report_headline_matches_our_data():
+    """The CSR's stated drop matches what our tidy data produces — no transcription drift."""
+    ours = uses("test_treatment_lowers_biomarker_vs_vehicle")["pct_drop"]
+    csr = doc("clinical_summary.pdf")
+    statement(f"the CSR's reported reduction matches our computed {ours:.0f}% drop")
+    assert csr.contains(f"{ours:.0f}% reduction")
+```
+
+This grounds the *agreement* itself: the PDF is pinned by `doc()`, the number is pinned
+transitively through `uses()`, and the single assert fails if the report and the data ever
+diverge. Each claim stays small and independently reviewable; higher-level claims inherit — never
+re-derive — their evidence and provenance.
 
 ## Tracing
 
