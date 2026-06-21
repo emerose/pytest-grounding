@@ -40,6 +40,7 @@ from ._capture import (
     record,
     registry,
 )
+from ._normalize import collapse_ws, fold_match
 from ._text import match_phrase, sha256
 from .loaders import (
     DocRef,
@@ -57,8 +58,8 @@ __all__ = [
     "statement", "evidence", "uses",
     "strength", "caveats", "kind", "reviewed",
     "Capture", "current_capture", "record", "registry", "TRACKED_SUFFIXES",
-    "match_phrase", "sha256",
+    "match_phrase", "sha256", "collapse_ws", "fold_match",
     "install_guard",
 ]
 
-__version__ = "0.0.2"
+__version__ = "0.0.3"
